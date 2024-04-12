@@ -7,7 +7,7 @@ from sqlalchemy.orm import mapped_column, Mapped
 from sqlalchemy.schema import ForeignKey
 
 
-from .base import Base, CommonDataTypes
+from . import Base
 
 
 # Палитра
@@ -17,7 +17,7 @@ from .base import Base, CommonDataTypes
 
 class Palette(Base):
     name: Mapped[str] = mapped_column(String(32), nullable=False)
-    # user_id: Mapped[int] = mapped_column(
-    #     Integer,
-    #     ForeignKey("user.id", ondelete="CASCADE"),
-    # )
+    user_id: Mapped[int] = mapped_column(
+        Integer,
+        ForeignKey("user.id", ondelete="CASCADE"),
+    )

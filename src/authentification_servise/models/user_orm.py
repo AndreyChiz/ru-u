@@ -1,7 +1,7 @@
 from sqlalchemy import LargeBinary, String
 from sqlalchemy.orm import mapped_column, Mapped
 
-from .base import Base
+from . import Base
 
 
 class User(Base):
