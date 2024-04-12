@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "test-case-for-ru-u"
+version = "0.1.0"
+description = "Some simple api for work with colors and palitras"
+authors = ["Andrey Chiz <achizhov_job@yandex.ru>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+alembic = "^1.13.1"
+fastapi = "^0.110.1"
+pydantic-settings = "^2.2.1"
+asyncpg = "^0.29.0"
+bcrypt = "^4.1.2"
+python-jose = "^3.3.0"
+uvicorn = "^0.29.0"
+sqlalchemy = "^2.0.29"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
