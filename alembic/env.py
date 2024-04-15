@@ -19,7 +19,9 @@ if config.config_file_name is not None:
 # add your model's MetaData object here
 # for 'autogenerate' support
 from src.auth_service.models import Base
-from src.color_palette_service.models import Base
+from src.palette_service.models import Base
+
+
 from src.config import settings
 
 

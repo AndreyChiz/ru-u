@@ -1,7 +1,22 @@
+from sqlalchemy import String
 from sqlalchemy.orm import mapped_column, Mapped
 from sqlalchemy.schema import ForeignKey
+from sqlalchemy import Index
 
-from . import Base, CustomType
+from src.database import Base
+
+
+# Палитра
+# - Идентификатор
+# - Название. Устанавливается пользователем при создании или изменении.
+
+
+class Palette(Base):
+    name: Mapped[str] = mapped_column(String(32), nullable=False)
+    user_id = mapped_column(ForeignKey("user.id", ondelete="CASCADE"), nullable=False)
+
+    __table_args__ = (Index("idx_palette_user_name", "user_id", "name", unique=True),)
+
 
 # Цвет
 # - Идентификатор
@@ -12,7 +27,7 @@ from . import Base, CustomType
 
 
 class Color(Base):
-    
+
     palette_id = mapped_column(
         ForeignKey("palette.id", ondelete="CASCADE"),
     )

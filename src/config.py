@@ -20,4 +20,5 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
-
+# print(settings)
+# print(settings.DATABASE_URL_asyncpg)
