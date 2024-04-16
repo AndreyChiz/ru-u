@@ -1,5 +1,5 @@
 from sqlalchemy import String
-from sqlalchemy.orm import mapped_column, Mapped
+from sqlalchemy.orm import mapped_column, Mapped, relationship
 from sqlalchemy.schema import ForeignKey
 from sqlalchemy import Index
 
@@ -17,6 +17,7 @@ class Palette(Base):
 
     __table_args__ = (Index("idx_palette_user_name", "user_id", "name", unique=True),)
 
+    user = relationship("User", back_populates="palettes")
 
 # Цвет
 # - Идентификатор

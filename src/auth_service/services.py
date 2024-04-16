@@ -1,16 +1,10 @@
-
 from sqlalchemy import select
-from src.database import session_factory
 from .models import User
 from src.config import settings
 from jose import jwt
 from src.database import in_session
 
-
 import bcrypt
-
-
-
 
 
 @in_session
@@ -22,11 +16,13 @@ async def create_user(session, user_data: dict):
 
 
 @in_session
-async def get_user(session, user_credentials: dict):
-    stmt = select(User).where(User.login == user_credentials["login"])
+async def get_user(session, login: str):
+    stmt = select(User).where(User.login == login)
     result = await session.execute(stmt)
     user = result.scalars().first()
     return user
+
+
 
 
 def create_token(user: User):
@@ -34,7 +30,6 @@ def create_token(user: User):
     ALGORITHM: str = settings.ALGORITHM
     claims = {"username": user.username, "login": user.login, "id": user.id}
     return jwt.encode(claims=claims, key=KEY, algorithm=ALGORITHM)
-
 
 
 def hash_password(password: str) -> bytes:

@@ -1,5 +1,5 @@
 from typing import Annotated
-from fastapi import APIRouter, status
+from fastapi import APIRouter, status, Response
 from fastapi.responses import JSONResponse
 from sqlalchemy.exc import IntegrityError
 
@@ -9,6 +9,7 @@ from .schema import (
     RegisterUserRequestSchema,
     RegisterUserResponseSchema,
     LoginUserRequestSchema,
+    LoginResponseSchema,
 )
 
 
@@ -28,21 +29,25 @@ async def register_user(user_credentials: RegisterUserRequestSchema):
     """New user registration"""
     try:
         created_user = await create_user(user_credentials.model_dump())
-        return RegisterUserResponseSchema(
-            username=created_user.username, login=created_user.login
-        )
+        return created_user
     except IntegrityError:
         raise UserAlreadyExistException()
 
 
-@router.post("/login", description="Автроизация пользователя")
+@router.post(
+    "/login", description="Автроизация пользователя", response_model=LoginResponseSchema
+)
 async def login_user(auth_request_data: LoginUserRequestSchema):
     """User loginig"""
-    if not (
-        user := await get_user(auth_request_data.model_dump())
-    ) or not check_password(auth_request_data.password, user.password):
+    if not (user := await get_user(auth_request_data.login)) or not check_password(
+        auth_request_data.password, user.password
+    ):
         raise UserCredantialsException
-    return JSONResponse(
-        content={"message": "login ok"},
+
+    response_model = LoginResponseSchema(message="login ok")
+    response = JSONResponse(
+        content=response_model.model_dump(),
         headers={"access_token": f"{create_token(user)}", "token_type": "Bearer"},
     )
+
+    return response

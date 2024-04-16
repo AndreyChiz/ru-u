@@ -1,6 +1,6 @@
 from fastapi import FastAPI, APIRouter, Response
 from src.auth_service.router import router as reg_user_router
-from src.palette_service.router import router as palette_router
+from src.palette_servise.router import router as palette_router
 from src.color_servise.router import router as color_router
 
 

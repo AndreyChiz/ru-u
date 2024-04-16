@@ -44,3 +44,7 @@ class LoginUserRequestSchema(BaseModel):
     @classmethod
     def valid_password(cls, password: str) -> str:
         return valid_password(password)
+
+
+class LoginResponseSchema(BaseModel):
+    message: str
