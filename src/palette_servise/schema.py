@@ -6,6 +6,11 @@ class PaletteRequestSchema(BaseModel):
     name: Annotated[str, Field(max_length=32)]
 
 
+class PaletteResponseSchema(PaletteRequestSchema):
+    id: int
+    user_id: int
+
+
 class PaletteRenameRequest(PaletteRequestSchema):
     new_name: Annotated[str, Field(max_length=32)]
 

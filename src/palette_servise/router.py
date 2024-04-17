@@ -1,5 +1,10 @@
 from fastapi import APIRouter, Depends, status
-from .schema import PaletteRequestSchema, PaletteRenameRequest, UserPalettesRsponse
+from .schema import (
+    PaletteRequestSchema,
+    PaletteRenameRequest,
+    UserPalettesRsponse,
+    PaletteResponseSchema,
+)
 from .servises import (
     create_new_palette,
     get_palette_by_id,
@@ -15,14 +20,18 @@ from sqlalchemy.exc import IntegrityError
 router = APIRouter()
 
 
-@router.post("/", 
-             status_code=status.HTTP_201_CREATED,
-             description="Создание плитры")
+@router.post(
+    "/",
+    status_code=status.HTTP_201_CREATED,
+    description="Создание плитры",
+    response_model=PaletteResponseSchema,
+)
 async def crate_palette(
     palette: PaletteRequestSchema, user_data=Depends(get_data_from_token)
 ):
     try:
-        return await create_new_palette(palette.name, user_data["id"])
+        created_palette = await create_new_palette(palette.name, user_data["id"])
+        return created_palette
     except IntegrityError:
         raise PaletteAlreadyExistException
 
@@ -42,7 +51,11 @@ async def get_my_paletts(user_data=Depends(get_data_from_token)):
     return result
 
 
-@router.delete("/{palette_id}", description="удаление палитры.")
+@router.delete(
+    "/{palette_id}",
+    response_model=PaletteResponseSchema,
+    description="удаление палитры.",
+)
 async def delete_palette_by_id(palette_id: int, user_data=Depends(get_data_from_token)):
     result = await drop_palette(palette_id, user_data["id"])
     if not result:
@@ -50,7 +63,9 @@ async def delete_palette_by_id(palette_id: int, user_data=Depends(get_data_from_
     return result
 
 
-@router.put("/rename", description="изменение палитры")
+@router.put(
+    "/rename", response_model=PaletteResponseSchema, description="изменение палитры"
+)
 async def rename_palette(
     request_data: PaletteRenameRequest, user_data=Depends(get_data_from_token)
 ):

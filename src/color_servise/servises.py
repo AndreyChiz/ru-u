@@ -5,6 +5,7 @@ from src.database import in_session
 from src.auth_service.models import User
 from src.palette_servise.models import Palette
 from sqlalchemy.exc import IntegrityError
+from src.palette_servise.servises import _get_user_palette_by_id
 
 
 async def _get_color_name_async(hex_color):
@@ -20,38 +21,47 @@ async def _get_color_name_async(hex_color):
         raise ColorNameRequestException
 
 
-@in_session
-async def create_new_color(session, palette_id: int, color_hex: bytes):
-
-    color_name = await _get_color_name_async(color_hex)
-
-    new_color = Color(palette_id=palette_id, color_hex=color_hex, name=color_name)
-    session.add(new_color)
-    return new_color
-
-
 async def _get_color_by_id(session, user_id: str, palette_id: int, color_id: int):
-    if user := await session.get(User, user_id):
-        target_palette = None
-        for palette in user.palettes:
-            if palette.id == palette_id:
-                target_palette = palette
-                break
-    if target_palette:
+    if target_palette := await _get_user_palette_by_id(session, palette_id, user_id):
         for color in target_palette.colors:
             if color.id == color_id:
                 return color
     return None
 
 
+@in_session
+async def get_color_by_id(session, user_id: str, palette_id: int, color_id: int):
+    if target_color := await _get_color_by_id(session, user_id, palette_id, color_id):
+        return target_color
 
 
 @in_session
-async def modify_palette_color_by_id(
+async def create_new_color(session, palette_id: int, color_hex: bytes, user_id: int):
+    if target_palette := await _get_user_palette_by_id(session, palette_id, user_id):
+        color_name = await _get_color_name_async(color_hex)
+        new_color = Color(palette_id=palette_id, color_hex=color_hex, name=color_name)
+        target_palette.colors.append(new_color)
+        return new_color
+
+
+@in_session
+async def modify_color_by_id(
     session, palette_id: int, color_id: int, color_hex: bytes, user_id: str
 ):
-    if target_color:= await _get_color_by_id(session, user_id, palette_id, color_id):
-        target_color.color_hex = color_hex
-        target_color.name = await _get_color_name_async(color_hex)
+    if target_palette := await _get_user_palette_by_id(session, palette_id, user_id):
+        for color in target_palette.colors:
+            if color.id == color_id:
+                color.color_hex = color_hex
+                color.name = await _get_color_name_async(color_hex)
+                return color
 
-    return target_color
+@in_session
+async def get_colors_of_palette(session, user_id: str, palette_id: int):
+    return await _get_user_palette_by_id(session, palette_id, user_id)
+
+
+@in_session
+async def delete_color_by_id(session, user_id: str, palette_id: int, color_id: int):
+    if target_color := await _get_color_by_id(session, user_id, palette_id, color_id):
+        await session.delete(target_color)
+        return target_color
