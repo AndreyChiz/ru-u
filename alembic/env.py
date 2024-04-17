@@ -20,6 +20,7 @@ if config.config_file_name is not None:
 # for 'autogenerate' support
 from src.auth_service.models import Base
 from src.palette_servise.models import Base
+from src.color_servise.models import Base
 
 
 from src.config import settings

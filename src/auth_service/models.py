@@ -14,4 +14,4 @@ class User(Base):
         back_populates="user", lazy="selectin"
     )
 
-    # palettes = relationship("Palette", back_populates="user")
+   

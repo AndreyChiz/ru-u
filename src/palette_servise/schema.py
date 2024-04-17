@@ -1,5 +1,5 @@
 from typing import Annotated, List
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class PaletteRequestSchema(BaseModel):
@@ -15,7 +15,11 @@ class PaletteSchema(PaletteRequestSchema):
 
 
 class UserPalettesRsponse(BaseModel):
-    id: int
+    model_config = ConfigDict(
+        populate_by_name=True,
+    )
+
+    id: int = Field(alias="user_id")
     username: str
     login: str
     palettes: List[PaletteSchema]

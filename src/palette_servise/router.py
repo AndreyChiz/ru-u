@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, status
 from .schema import PaletteRequestSchema, PaletteRenameRequest, UserPalettesRsponse
 from .servises import (
     create_new_palette,
@@ -10,12 +10,14 @@ from .servises import (
 from src.security import get_data_from_token
 from src.exceptions import PaletteAlreadyExistException, PaletteNotFoundException
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm.exc import UnmappedInstanceError
+
 
 router = APIRouter()
 
 
-@router.post("/", description="Создание плитры")
+@router.post("/", 
+             status_code=status.HTTP_201_CREATED,
+             description="Создание плитры")
 async def crate_palette(
     palette: PaletteRequestSchema, user_data=Depends(get_data_from_token)
 ):
@@ -37,7 +39,7 @@ async def get_palette(palette_id: int, user_data=Depends(get_data_from_token)):
 )
 async def get_my_paletts(user_data=Depends(get_data_from_token)):
     result = await get_paletts_by_user_id(user_data["id"])
-    return result 
+    return result
 
 
 @router.delete("/{palette_id}", description="удаление палитры.")

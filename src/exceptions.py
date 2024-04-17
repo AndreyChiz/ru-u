@@ -45,3 +45,18 @@ class InvalidTokenException(HTTPException):
         super().__init__(
             status_code=self.STATUS_CODE, detail=self.DETAIL, headers=self.HEADERS
         )
+
+
+class ColorNameRequestException(RegUserBaseException):
+    STATUS_CODE = status.HTTP_400_BAD_REQUEST
+    DETAIL = "Can not get color name from HTTP"
+
+
+class ColorAlreadyExistException(RegUserBaseException):
+    STATUS_CODE = status.HTTP_400_BAD_REQUEST
+    DETAIL = "The color with the current name  is already exist in this palette"
+
+
+class ColorNotExistExistException(RegUserBaseException):
+    STATUS_CODE = status.HTTP_400_BAD_REQUEST
+    DETAIL = "The color with the current id is not exist in this palette"

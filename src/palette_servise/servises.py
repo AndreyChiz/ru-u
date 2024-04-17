@@ -11,34 +11,37 @@ async def create_new_palette(session, palete_name: str, user_id: str):
     session.add(new_palette)
     return new_palette
 
+async def _get_user_palette_by_id(session, palette_id: int, user_id: int):
+    if user := await session.get(User, user_id):
+        for palette in user.palettes:
+            if palette.id == palette_id:
+                return palette
 
 @in_session
 async def get_palette_by_id(session, palette_id: int, user_id: int):
-    user = await session.get(User, user_id)
-    for palette in user.palettes:
-        if palette.id == palette_id:
-            return palette
+    return await _get_user_palette_by_id(session, palette_id, user_id)
 
 
 @in_session
 async def get_paletts_by_user_id(session, user_id: int):
-    user = await session.get(User, user_id)
-    return user
+    palettes = await session.get(User, user_id)
+    return palettes
 
 
 @in_session
 async def drop_palette(session, palette_id: int, user_id: int):
-    user = await session.get(User, user_id)
-    for palette in user.palettes:
-        if palette.id == palette_id:
-            await session.delete(palette)
-            return palette
+    if user:= await session.get(User, user_id):
+        for palette in user.palettes:
+            if palette.id == palette_id:
+                await session.delete(palette)
+                return palette
 
 
 @in_session
 async def set_palette_name(session, changes: dict, user_id: int):
     user = await session.get(User, user_id)
-    for palette in user.palettes:
-        if palette.name == changes["name"]:
-            palette.name = changes["new_name"]
-            return palette
+    if user:
+        for palette in user.palettes:
+            if palette.name == changes["name"]:
+                palette.name = changes["new_name"]
+                return palette
