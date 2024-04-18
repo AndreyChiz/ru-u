@@ -46,3 +46,7 @@ def in_session(func):
                 return await func(session, *args, **kwargs)
 
     return wrapper
+
+async def get_async_session():
+    async with session_factory() as session:
+        yield session

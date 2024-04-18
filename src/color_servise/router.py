@@ -14,6 +14,7 @@ from src.exceptions import (
     PaletteNotFoundException,
 )
 from sqlalchemy.exc import IntegrityError
+from src.database import get_async_session
 
 router = APIRouter(prefix="/{palette_id}/color")
 
@@ -28,13 +29,17 @@ async def crate_color(
     palette_id: int,
     color_data: ColorRequestSchema,
     user_data=Depends(get_data_from_token),
+    session=Depends(get_async_session),
 ):
     try:
-        return await create_new_color(
+        if created_color:= await create_new_color(
+            session=session,
             palette_id=palette_id,
             color_hex=color_data.color_hex,
             user_id=user_data["id"],
-        )
+        ):
+            return created_color
+        raise PaletteNotFoundException
     except IntegrityError:
         raise ColorAlreadyExistException
 
@@ -48,8 +53,10 @@ async def get_color(
     palette_id: int,
     color_id: int,
     user_data=Depends(get_data_from_token),
+    session=Depends(get_async_session),
 ):
     if color := await get_color_by_id(
+        session=session,
         palette_id=palette_id,
         color_id=color_id,
         user_id=user_data["id"],
@@ -66,8 +73,9 @@ async def get_color(
 async def get_colors(
     palette_id: int,
     user_data=Depends(get_data_from_token),
+    session=Depends(get_async_session),
 ):
-    if  colors:= await get_colors_of_palette(user_id=user_data["id"], palette_id=palette_id):
+    if  colors:= await get_colors_of_palette(session=session, user_id=user_data["id"], palette_id=palette_id):
         return colors
     raise PaletteNotFoundException
 
@@ -78,10 +86,12 @@ async def change_color(
     color_id: int,
     color_data: ColorRequestSchema,
     user_data=Depends(get_data_from_token),
+    session=Depends(get_async_session),
 ):
     try:
 
         modifed_palete = await modify_color_by_id(
+            session=session,
             palette_id=palette_id,
             color_id=color_id,
             color_hex=color_data.color_hex,
@@ -104,8 +114,10 @@ async def delete_color(
     palette_id: int,
     color_id: int,
     user_data=Depends(get_data_from_token),
+    session=Depends(get_async_session),
 ):
     if color := await delete_color_by_id(
+        session=session,
         palette_id=palette_id,
         color_id=color_id,
         user_id=user_data["id"],

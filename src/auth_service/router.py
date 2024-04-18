@@ -1,5 +1,5 @@
 from typing import Annotated
-from fastapi import APIRouter, status, Response
+from fastapi import APIRouter, status, Response, Depends
 from fastapi.responses import JSONResponse
 from sqlalchemy.exc import IntegrityError
 
@@ -14,7 +14,7 @@ from .schema import (
 
 
 from src.exceptions import UserAlreadyExistException, UserCredantialsException
-
+from src.database import get_async_session
 
 router = APIRouter()
 
@@ -25,10 +25,12 @@ router = APIRouter()
     response_model=RegisterUserResponseSchema,
     description="Регистрация пользователя",
 )
-async def register_user(user_credentials: RegisterUserRequestSchema):
+async def register_user(
+    user_credentials: RegisterUserRequestSchema, session=Depends(get_async_session)
+):
     """New user registration"""
     try:
-        created_user = await create_user(user_credentials.model_dump())
+        created_user = await create_user(session, user_credentials.model_dump())
         return created_user
     except IntegrityError:
         raise UserAlreadyExistException()
@@ -37,11 +39,13 @@ async def register_user(user_credentials: RegisterUserRequestSchema):
 @router.post(
     "/login", description="Автроизация пользователя", response_model=LoginResponseSchema
 )
-async def login_user(auth_request_data: LoginUserRequestSchema):
+async def login_user(
+    auth_request_data: LoginUserRequestSchema, session=Depends(get_async_session)
+):
     """User loginig"""
-    if not (user := await get_user(auth_request_data.login)) or not check_password(
-        auth_request_data.password, user.password
-    ):
+    if not (
+        user := await get_user(session, auth_request_data.login)
+    ) or not check_password(auth_request_data.password, user.password):
         raise UserCredantialsException
 
     response_model = LoginResponseSchema(message="login ok")

@@ -2,25 +2,27 @@ from sqlalchemy import select
 from .models import User
 from src.config import settings
 from jose import jwt
-from src.database import in_session
+
 
 import bcrypt
 
 
-@in_session
+
 async def create_user(session, user_data: dict):
-    new_user = User(**user_data)
-    new_user.password = hash_password(new_user.password)
-    session.add(new_user)
-    return new_user
+    async with session.begin():
+        new_user = User(**user_data)
+        new_user.password = hash_password(new_user.password)
+        session.add(new_user)
+        return new_user
 
 
-@in_session
+
 async def get_user(session, login: str):
-    stmt = select(User).where(User.login == login)
-    result = await session.execute(stmt)
-    user = result.scalars().first()
-    return user
+    async with session.begin():
+        stmt = select(User).where(User.login == login)
+        result = await session.execute(stmt)
+        user = result.scalars().first()
+        return user
 
 
 
