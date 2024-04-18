@@ -21,7 +21,7 @@ from src.database import Base
 
 DATABASE_URL_TEST = settings.TEST_DATABASE_URL_asyncpg
 
-engine_test = create_async_engine(DATABASE_URL_TEST, echo=True, poolclass=NullPool)
+engine_test = create_async_engine(DATABASE_URL_TEST, poolclass=NullPool)
 
 session_factory = sessionmaker(
     bind=engine_test, expire_on_commit=False, class_=AsyncSession
@@ -32,8 +32,7 @@ Base.metadata.bind = engine_test
 
 async def override_get_async_session():
     async with session_factory() as session:
-        async with session.begin():
-            yield session
+        yield session
 
 
 app.dependency_overrides[get_async_session] = override_get_async_session
