@@ -1,6 +1,7 @@
 from typing import Annotated
 from fastapi import APIRouter, status, Response, Depends
 from fastapi.responses import JSONResponse
+from pydantic import ValidationError
 from sqlalchemy.exc import IntegrityError
 
 

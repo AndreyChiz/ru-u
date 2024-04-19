@@ -23,7 +23,7 @@ def valid_password(password: str) -> str:
 
 
 class RegisterUserResponseSchema(BaseModel):
-    username: Annotated[str, Field(max_length=32)]
+    username: Annotated[str, Field(min_length=3, max_length=32)]
     login: login_type
 
 

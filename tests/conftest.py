@@ -2,7 +2,7 @@ import asyncio
 from typing import AsyncGenerator
 from functools import wraps
 from fastapi.testclient import TestClient
-from httpx import AsyncClient
+from httpx import ASGITransport, AsyncClient
 from sqlalchemy import NullPool
 from src.config import settings
 from sqlalchemy.ext.asyncio import (
@@ -56,8 +56,9 @@ async def prepare_database():
 
 @pytest.fixture(scope="session")
 async def ac():
-    async with AsyncClient(app, base_url="http://test") as ac:
+    async with AsyncClient(
+        transport=ASGITransport(app=app), base_url="http://test"
+    ) as ac:
         yield ac
 
 
-client = TestClient(app)
