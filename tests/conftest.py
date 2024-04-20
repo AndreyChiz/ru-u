@@ -1,8 +1,4 @@
-import asyncio
 
-from typing import AsyncGenerator
-from functools import wraps
-from fastapi.testclient import TestClient
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy import NullPool
 from src.config import settings
@@ -51,15 +47,19 @@ def prepare_database():
 
 
 @pytest.fixture(scope="session")
-def event_loop(request):
-    loop = asyncio.get_event_loop_policy().new_event_loop()
-    yield loop
-    loop.close()
-
-
-@pytest.fixture(scope="session")
 async def ac():
     async with AsyncClient(
         transport=ASGITransport(app=app), base_url="http://test"
     ) as ac:
         yield ac
+
+
+test_files_order = [
+    'test_registration.py',
+    'test_login.py'
+    
+]
+
+
+def pytest_collection_modifyitems(session, config, items):
+    items.sort(key=lambda item: test_files_order.index(item.fspath.basename))

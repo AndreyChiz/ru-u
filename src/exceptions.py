@@ -13,7 +13,7 @@ class RegUserBaseException(HTTPException):
 
 class UserAlreadyExistException(RegUserBaseException):
     STATUS_CODE = status.HTTP_400_BAD_REQUEST
-    DETAIL = "User with this email or login already exist"
+    DETAIL = "User with this name or login already exist"
 
 
 class PaletteAlreadyExistException(RegUserBaseException):
@@ -29,6 +29,14 @@ class UserCredantialsException(RegUserBaseException):
 class UserPasswordValidationException(RegUserBaseException):
     STATUS_CODE = status.HTTP_400_BAD_REQUEST
     DETAIL = "Password must contain at least one lower character, one upper character, digit or special symbol"
+
+
+class UsernameValidationException(RegUserBaseException):
+    STATUS_CODE = status.HTTP_400_BAD_REQUEST
+    DETAIL = "Username must contain at least only letters"
+
+
+
 
 
 class PaletteNotFoundException(RegUserBaseException):
