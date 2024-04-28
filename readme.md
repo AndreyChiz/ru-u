@@ -13,7 +13,8 @@ git clone https://github.com/AndreyChiz/ru-u.git
 ```
 
 2. Перейдите в каталог проекта
-3. Запустите приложение при помощи команды
+3. Переименуйте файл template.env в .env, или настройте .env в соответствии.
+4. Запустите приложение при помощи команды
 
 ```shell
 docker-compose up -d --build
