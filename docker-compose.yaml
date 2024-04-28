@@ -1,0 +1,49 @@
+version: '3'
+
+services:
+
+  nginx:
+    container_name: nginx
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./volumes/nginx_conf/conf.d:/etc/nginx/conf.d
+    depends_on:
+      - api
+    networks:
+      - ru_u_net
+    env_file:
+      - .env
+
+  api:
+    container_name: api
+    image: api
+    depends_on:
+      - postgres
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    networks:
+      - ru_u_net
+    volumes:
+      - ./app:/app
+    command: sh -c "pip install --upgrade pip && pip install -r requirements.txt && alembic upgrade head && uvicorn src.app:app --reload --host 0.0.0.0 --port 8000"
+    env_file:
+      - .env
+
+
+  postgres:
+    container_name: postgres
+    image: postgres:15-alpine3.19
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASS}
+    networks:
+      - ru_u_net
+    env_file:
+      - .env
+
+networks:
+  ru_u_net:

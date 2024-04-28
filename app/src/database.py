@@ -1,4 +1,3 @@
-
 from functools import wraps
 from sqlalchemy import Identity, String, BigInteger
 from sqlalchemy.orm import (
@@ -15,7 +14,7 @@ from sqlalchemy.ext.asyncio import (
     AsyncSession,
 )
 
-from src.config import settings
+from .config import settings
 
 
 DATABASE_URL = str(settings.DATABASE_URL_asyncpg)
@@ -46,6 +45,7 @@ def in_session(func):
                 return await func(session, *args, **kwargs)
 
     return wrapper
+
 
 async def get_async_session():
     async with session_factory() as session:
